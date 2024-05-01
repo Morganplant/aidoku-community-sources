@@ -1,11 +1,6 @@
 name: Build sources
 on:
-  push:
-    branches:
-    - main
-    paths:
-    - 'src/**'
-    - '.github/workflows/build.yaml'
+  workflow_dispatch
 
 concurrency:
   group: ${{ github.workflow }}
