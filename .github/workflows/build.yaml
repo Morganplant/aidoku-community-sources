@@ -1,9 +1,9 @@
 name: Build sources
 on:
+  workflow_dispatch:
   push:
-      branches:
-        - main
-  workflow_dispatch
+   branches:
+     - master
 
 concurrency:
   group: ${{ github.workflow }}
