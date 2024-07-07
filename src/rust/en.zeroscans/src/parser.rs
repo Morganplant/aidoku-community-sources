@@ -131,7 +131,9 @@ pub fn parse_manga_details(manga_id: String) -> Result<Manga> {
 	let manga = all_comics()?
 		.into_iter()
 		.find(|manga| manga.id == manga_id)
-		.expect("Manga not found");
+		.ok_or(AidokuError {
+			reason: AidokuErrorKind::Unimplemented,
+		})?;
 
 	Ok(manga)
 }
@@ -140,7 +142,7 @@ pub fn parse_chapter_list(manga_id: String) -> Result<Vec<Chapter>> {
 	let mut all_chapters: Vec<Chapter> = Vec::new();
 	let mut page = 1;
 
-	let (id, slug) = get_identifiers(&manga_id);
+	let (id, slug) = get_identifiers(&manga_id)?;
 
 	loop {
 		let url = format!(
@@ -187,7 +189,7 @@ pub fn parse_chapter_list(manga_id: String) -> Result<Vec<Chapter>> {
 }
 
 pub fn parse_page_list(manga_id: String, chapter_id: String) -> Result<Vec<Page>> {
-	let (_, slug) = get_identifiers(&manga_id);
+	let (_, slug) = get_identifiers(&manga_id)?;
 
 	let url = format!(
 		"{}/swordflake/comic/{}/chapters/{}",
@@ -221,7 +223,7 @@ pub fn modify_image_request(request: Request) {
 
 pub fn handle_url(url: String) -> Result<DeepLink> {
 	if let Some((slug, chapter_id)) = parse_url(&url) {
-		let data = all_comics().expect("Failed to load cached comics");
+		let data = all_comics()?;
 		let comic = data.into_iter().find(|comic| comic.id.contains(&slug));
 
 		if let Some(chapter_id) = chapter_id {
